@@ -1,0 +1,40 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: JarLauncher - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP62E.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Debug/" /Fp"Debug/JarLauncher.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\000\VC\MyWork6\JarLauncher\JarLauncher.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP62E.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP62F.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:yes /pdb:"Debug/JarLauncher.pdb" /debug /machine:I386 /out:"Debug/JarLauncher.exe" /pdbtype:sept 
+.\Debug\JarLauncher.obj
+.\Debug\JarLauncherDlg.obj
+.\Debug\StdAfx.obj
+.\Debug\JarLauncher.res
+.\Debug\TabCtrlSSL.obj
+.\Debug\TabPageSSL.obj
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP62F.tmp"
+<h3>Output Window</h3>
+Compiling...
+JarLauncher.cpp
+Linking...
+Creating command line "bscmake.exe /nologo /o"Debug/JarLauncher.bsc"  .\Debug\StdAfx.sbr .\Debug\JarLauncher.sbr .\Debug\JarLauncherDlg.sbr .\Debug\TabCtrlSSL.sbr .\Debug\TabPageSSL.sbr"
+Creating browse info file...
+<h3>Output Window</h3>
+
+
+
+<h3>Results</h3>
+JarLauncher.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
