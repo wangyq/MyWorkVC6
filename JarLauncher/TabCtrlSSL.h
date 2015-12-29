@@ -32,7 +32,10 @@ typedef struct {
 /////////////////////////////////////////////////////////////////////////////
 // CTabCtrlSSL window
 
-class CTabCtrlSSL : public CTabCtrl {
+class CTabCtrlSSL : public CTabCtrl 
+{
+	DECLARE_DYNAMIC(CTabCtrlSSL)
+
 public:
 // Construction
 	CTabCtrlSSL ();

@@ -118,7 +118,14 @@ BOOL CJarLauncherDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 	
 	// TODO: Add extra initialization here
+	//CRect rect;
+	//GetClientRect(&rect);
+	//只能create一次, 此处为异常
+	//m_tabMain.Create(TCS_TABS | TCS_FIXEDWIDTH | WS_CHILD | WS_VISIBLE, rect, this, IDC_TAB_MAIN);
 	
+
+	m_tabMain.Init();
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 

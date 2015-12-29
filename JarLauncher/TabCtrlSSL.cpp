@@ -13,6 +13,8 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // Construction
 
+IMPLEMENT_DYNAMIC(CTabCtrlSSL,CTabCtrl)
+
 CTabCtrlSSL::CTabCtrlSSL () {
 #ifndef _AFX_NO_OCC_SUPPORT
 	AfxEnableControlContainer ();

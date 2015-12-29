@@ -6,30 +6,28 @@
 --------------------Configuration: JarLauncher - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP62E.tmp" with contents
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP2149.tmp" with contents
 [
 /nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Debug/" /Fp"Debug/JarLauncher.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
-"D:\000\VC\MyWork6\JarLauncher\JarLauncher.cpp"
+"D:\000\VC\MyWorkVC6\JarLauncher\TabMain.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP62E.tmp" 
-Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP62F.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP2149.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP214A.tmp" with contents
 [
 /nologo /subsystem:windows /incremental:yes /pdb:"Debug/JarLauncher.pdb" /debug /machine:I386 /out:"Debug/JarLauncher.exe" /pdbtype:sept 
 .\Debug\JarLauncher.obj
 .\Debug\JarLauncherDlg.obj
 .\Debug\StdAfx.obj
-.\Debug\JarLauncher.res
 .\Debug\TabCtrlSSL.obj
+.\Debug\TabMain.obj
 .\Debug\TabPageSSL.obj
+.\Debug\JarLauncher.res
 ]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP62F.tmp"
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP214A.tmp"
 <h3>Output Window</h3>
 Compiling...
-JarLauncher.cpp
+TabMain.cpp
 Linking...
-Creating command line "bscmake.exe /nologo /o"Debug/JarLauncher.bsc"  .\Debug\StdAfx.sbr .\Debug\JarLauncher.sbr .\Debug\JarLauncherDlg.sbr .\Debug\TabCtrlSSL.sbr .\Debug\TabPageSSL.sbr"
-Creating browse info file...
-<h3>Output Window</h3>
 
 
 

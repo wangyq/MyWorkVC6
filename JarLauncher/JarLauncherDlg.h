@@ -20,7 +20,7 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CJarLauncherDlg)
 	enum { IDD = IDD_JARLAUNCHER_DIALOG };
-	CTabCtrlSSL	m_tabMain;
+	CTabMain	m_tabMain;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
