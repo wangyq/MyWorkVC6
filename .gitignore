@@ -6,6 +6,7 @@
 *.ncb
 *.log
 *.pdb
+*.manifest
 *.vcproj.*.user
 *.orig
 *.db
