@@ -58,7 +58,7 @@ public:
 
 		void AddTabMain( )
 		{
-			TCHAR inTabName[] = _T("Run Jar");
+			TCHAR inTabName[] = _T("Esxi Find");
 			
 			CTabViewMain*	theView = new CTabViewMain;
 			theView->Create( *this );

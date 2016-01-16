@@ -7,6 +7,7 @@
 *.log
 *.pdb
 *.manifest
+*.bsc
 *.vcproj.*.user
 *.orig
 *.db

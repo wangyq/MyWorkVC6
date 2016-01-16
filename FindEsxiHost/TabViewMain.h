@@ -255,6 +255,8 @@ public:
 			m_btnScan.SetWindowText(_T("Scan"));
 			m_btnScan.EnableWindow(TRUE);  //enable now
 			m_bState = E_STATE_NORMAL;     //normal state!
+			//======= restore bForeStop  ========
+			bForceStop = FALSE;
 
 		}else{
 			strInfo = _T("Unkown msg!\r\n");
