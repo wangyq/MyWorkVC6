@@ -7,11 +7,13 @@
 #include <atlctrls.h>
 #include <atldlgs.h>
 #include <atlctrlw.h>
+#include <atlmisc.h>
 
 #include "resource.h"
 
 #include "aboutdlg.h"
 
+#include "ButtonMenu.h"
 #include "TabViewMain.h"
 #include "TabCtrlMain.h"
 #include "maindlg.h"
@@ -50,7 +52,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	// this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used
 	::DefWindowProc(NULL, 0, 0, 0L);
 
-	AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES);	// add flags to support other controls
+	AtlInitCommonControls(ICC_COOL_CLASSES | ICC_BAR_CLASSES|ICC_WIN95_CLASSES);	// add flags to support other controls
 
 	hRes = _Module.Init(NULL, hInstance);
 	ATLASSERT(SUCCEEDED(hRes));

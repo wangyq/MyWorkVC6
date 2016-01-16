@@ -3,24 +3,34 @@
 <pre>
 <h1>Build Log</h1>
 <h3>
---------------------Configuration: JarRun - Win32 Debug--------------------
+--------------------Configuration: JarRun - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP22BD.tmp" with contents
+Creating command line "rc.exe /l 0x804 /fo"Release/JarRun.res" /d "NDEBUG" "D:\000\VC\MyWorkVC6\JarRun\JarRun.rc"" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP152.tmp" with contents
 [
-/nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "STRICT" /Fp"Debug/JarRun.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+/nologo /MT /W3 /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "STRICT" /D "_ATL_MIN_CRT" /Fp"Release/JarRun.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
 "D:\000\VC\MyWorkVC6\JarRun\JarRun.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP22BD.tmp" 
-Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP22BE.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP152.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP153.tmp" with contents
 [
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:yes /pdb:"Debug/JarRun.pdb" /debug /machine:I386 /out:"Debug/JarRun.exe" /pdbtype:sept 
-.\Debug\JarRun.obj
-.\Debug\stdafx.obj
-.\Debug\JarRun.res
+/nologo /MT /W3 /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "STRICT" /D "_ATL_MIN_CRT" /Fp"Release/JarRun.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\000\VC\MyWorkVC6\JarRun\stdafx.cpp"
 ]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP22BE.tmp"
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP153.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP154.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/JarRun.pdb" /machine:I386 /out:"Release/JarRun.exe" 
+.\Release\JarRun.obj
+.\Release\stdafx.obj
+.\Release\JarRun.res
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP154.tmp"
 <h3>Output Window</h3>
+Compiling resources...
+Compiling...
+stdafx.cpp
 Compiling...
 JarRun.cpp
 Linking...

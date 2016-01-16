@@ -26,15 +26,31 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 // Dialog
 //
 
-IDD_VIEW_MAIN DIALOG DISCARDABLE  0, 0, 269, 220
+IDD_DIALOG_VIEW_MAIN DIALOG DISCARDABLE  0, 0, 261, 214
 STYLE WS_CHILD
 FONT 10, "System"
 BEGIN
-    LISTBOX         IDC_LIST_JARFILE,7,27,255,186,LBS_SORT | 
-                    LBS_NOINTEGRALHEIGHT | LBS_MULTICOLUMN | WS_VSCROLL | 
-                    WS_TABSTOP
-    PUSHBUTTON      "Add+",IDC_BUTTON_ADD,7,7,50,14
-    PUSHBUTTON      "ShowAs",IDC_BUTTON_SHOWAS,60,7,50,14
+    EDITTEXT        IDC_EDIT_ESXI_HOST,7,36,247,171,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL
+    LTEXT           "IP Addr:",IDC_STATIC,7,7,26,8
+    EDITTEXT        IDC_EDIT_IPADDR,7,21,178,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Scan",IDC_BUTTON_SCAN,204,19,50,14
+    LTEXT           "(For example: 192.168.1.20-220), 192.168.1.120",
+                    IDC_STATIC,44,7,156,8
+END
+
+IDD_DIALOG_VIEW_ABOUT DIALOG DISCARDABLE  0, 0, 237, 172
+STYLE WS_CHILD
+FONT 10, "System"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,45,14,20,20
+    CTEXT           "EsxiFinder Application \n[v1.0]\n\n(c) Copyright 2016 ",
+                    IDC_STATIC,7,35,103,35
+    LTEXT           "https://yinqingwang.wordpress.com",IDC_STATIC_VISIT,40,
+                    85,116,8
+    LTEXT           "visit me:",IDC_STATIC,7,85,29,8
+    LTEXT           "Contact: ",IDC_STATIC,7,73,29,8
+    LTEXT           "yinqingwang@163.com",IDC_STATIC_MAIL,39,73,77,8
 END
 
 
@@ -46,12 +62,20 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
-    IDD_VIEW_MAIN, DIALOG
+    IDD_DIALOG_VIEW_MAIN, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 262
+        RIGHTMARGIN, 254
         TOPMARGIN, 7
-        BOTTOMMARGIN, 213
+        BOTTOMMARGIN, 207
+    END
+
+    IDD_DIALOG_VIEW_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 230
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 165
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -88,7 +112,7 @@ END
 
 3 TEXTINCLUDE DISCARDABLE 
 BEGIN
-    "CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST ""res\\\\JarRun.exe.manifest""\r\n"
+    "CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST ""res\\\\FindEsxiHost.exe.manifest""\r\n"
     "\0"
 END
 
@@ -102,29 +126,31 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\JarRun.ico"
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\FindEsxiHost.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 306, 197
-STYLE WS_CHILD
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 187, 102
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CTEXT           "JarRun Application v1.0\n\n(c) Copyright 2015",
+    DEFPUSHBUTTON   "OK",IDOK,130,81,50,14
+    CTEXT           "FindEsxiHost Application v1.0\n\n(c) Copyright 2016",
                     IDC_STATIC,25,57,78,32
-    ICON            IDR_MAINFRAME,IDC_STATIC,55,26,21,23
-    GROUPBOX        "",IDC_STATIC,7,7,292,183
+    ICON            IDR_MAINFRAME,IDC_STATIC,55,26,20,20
+    GROUPBOX        "",IDC_STATIC,7,7,115,88
 END
 
-IDD_MAINDLG DIALOG DISCARDABLE  0, 0, 375, 301
+IDD_MAINDLG DIALOG DISCARDABLE  0, 0, 367, 296
 STYLE WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
-CAPTION "JarRun"
+CAPTION "EsxiFinder"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Tab1",IDC_TAB_MAIN,"SysTabControl32",0x0,7,7,361,287
+    CONTROL         "Tab1",IDC_TAB_MAIN,"SysTabControl32",0x0,7,7,353,282
 END
 
 
@@ -139,17 +165,17 @@ BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 299
+        RIGHTMARGIN, 180
         TOPMARGIN, 7
-        BOTTOMMARGIN, 190
+        BOTTOMMARGIN, 95
     END
 
     IDD_MAINDLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 368
+        RIGHTMARGIN, 360
         TOPMARGIN, 7
-        BOTTOMMARGIN, 294
+        BOTTOMMARGIN, 289
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -203,12 +229,12 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "CompanyName", "\0"
-            VALUE "FileDescription", "JarRun Module\0"
+            VALUE "FileDescription", "FindEsxiHost Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
-            VALUE "InternalName", "JarRun\0"
-            VALUE "LegalCopyright", "Copyright 2015\0"
-            VALUE "OriginalFilename", "JarRun.exe\0"
-            VALUE "ProductName", "JarRun Module\0"
+            VALUE "InternalName", "FindEsxiHost\0"
+            VALUE "LegalCopyright", "Copyright 2016\0"
+            VALUE "OriginalFilename", "FindEsxiHost.exe\0"
+            VALUE "ProductName", "FindEsxiHost Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"
         END
     END
@@ -228,7 +254,7 @@ END
 
 STRINGTABLE PRELOAD DISCARDABLE 
 BEGIN
-    IDR_MAINFRAME           "JarRun"
+    IDR_MAINFRAME           "FindEsxiHost"
 END
 
 STRINGTABLE DISCARDABLE 
@@ -313,6 +339,8 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     ATL_IDS_MRU_FILE        "Open this document"
+    IDS_ESXI_HOST_PORT      "902"
+    IDS_ESXI_HOST_TOKEN     "VMware"
 END
 
 #endif    // English (U.S.) resources
@@ -325,7 +353,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "res\\JarRun.exe.manifest"
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "res\\FindEsxiHost.exe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
