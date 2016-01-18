@@ -35,8 +35,8 @@ BEGIN
     LTEXT           "IP Addr:",IDC_STATIC,7,7,26,8
     EDITTEXT        IDC_EDIT_IPADDR,7,21,178,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Scan",IDC_BUTTON_SCAN,204,19,50,14
-    LTEXT           "(For example: 192.168.1.20-220), 192.168.1.120",
-                    IDC_STATIC,44,7,156,8
+    LTEXT           "(For example: 192.168.1.20-220, 192.168.1.120, ...)",
+                    IDC_STATIC,44,7,166,8
 END
 
 IDD_DIALOG_VIEW_ABOUT DIALOG DISCARDABLE  0, 0, 237, 172
@@ -93,41 +93,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
 
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "#include ""atlres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE DISCARDABLE 
-BEGIN
-    "CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST ""res\\\\FindEsxiHost.exe.manifest""\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\FindEsxiHost.ico"
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -180,6 +145,41 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""atlres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST ""res\\\\FindEsxiHost.exe.manifest""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\FindEsxiHost.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
