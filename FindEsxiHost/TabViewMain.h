@@ -14,23 +14,23 @@ class CTabViewMain : public CDialogImpl<CTabViewMain>
 {
 private:
 
-	enum{
-		E_STATE_NORMAL = 1,
-			E_STATE_RUNNING = 2,
-			E_STATE_FORCESTOP = 3,
-			E_STATE_END
-	};
+    enum {
+        E_STATE_NORMAL = 1,
+        E_STATE_RUNNING = 2,
+        E_STATE_FORCESTOP = 3,
+        E_STATE_END
+    };
 
-	int m_bState ; //current running state!
+    int m_bState ; //current running state!
 
-	CButton m_btnScan;
+    CButton m_btnScan;
     CEdit m_ctrIPAddr;
     CEdit m_ctrlEsxiHost;
 
     CString m_strEsxiHostToken;
     int m_iPort;
 
-	//======================
+    //======================
     void LoadTokenAndPort() {
 
 #define MAX_SIZE 255
@@ -83,22 +83,31 @@ private:
     }
 #endif //if 0
 
-    //Available is : 192.168.0.10-120, or 192.168.1.40
+    //Available is : 192.168.0.10-120, or 192.168.1.40 or 172.16.1.0/16
     BOOL ProcessIPNet(const CString& strIP, CSimpleValArray<int> & arrIP) {
 
         if (strIP.IsEmpty()) return TRUE;
 
         int ip = 0;
-        int iPos = strIP.Find(_T("-"));
-        if (iPos == -1) {//not found of "-"
-            if (IPv4StrToInt(strIP, ip)) {
-                arrIP.Add(ip);
-            } else {
-                return FALSE;  //wrong ip address!
-            }
+        int iPos = -1;
 
-        } else { // 192.168.0.20-120
+        if ((iPos = strIP.Find(_T("/"))) != -1) {//172.16.1.0/16
+			CString strBase = strIP.Left(iPos);
+			if (!IPv4StrToInt(strBase, ip)) return FALSE;
 
+			int masklen = Str2Int(strIP.Mid(iPos + 1)); //16
+			if( masklen<=0 || masklen>32 ) return FALSE;
+
+			if( masklen == 32 ){
+				arrIP.Add(ip);
+			} else{
+				int start = ip & (((1<<masklen)-1)<<(32-masklen));
+				int count = 1<<(32-masklen);
+				for(int i=0;i<count;i++){
+					arrIP.Add(start+i);
+				}
+			}
+        } else if ((iPos = strIP.Find(_T("-"))) != -1) {//192.168.0.20-120
             int start, end;
 
             CString strBase = strIP.Left(iPos); //192.168.0.20
@@ -114,12 +123,18 @@ private:
             for (int i = 0; i <= (end - start); i++) {
                 arrIP.Add(ip + i);
             }
+        } else { // not found. so it is : 192.168.0.20
+            if (IPv4StrToInt(strIP, ip)) {
+                arrIP.Add(ip);
+            } else {
+                return FALSE;  //wrong ip address!
+            }
 
         }
         return TRUE;
     }
 
-    //Available format is : 192.168.0.10-200, 192.168.1.30
+    //Available format is : 192.168.0.10-200, 192.168.1.30, 172.16.1.0/16
     //
     BOOL ParseIPAddress(const CString& strIP, CSimpleValArray<int> & arrIP) {
 
@@ -147,10 +162,10 @@ private:
         return TRUE;
     }
 
-	// return :
-	// TRUE if start successful, FALSE otherwise.
-	BOOL StartRunning(){
-		#define MAX_SIZE 255
+    // return :
+    // TRUE if start successful, FALSE otherwise.
+    BOOL StartRunning() {
+#define MAX_SIZE 255
 
         TCHAR szIP[MAX_SIZE + 2] ;
         CString strIP("");
@@ -164,7 +179,7 @@ private:
             strIP.TrimRight();
         }
         if (strIP.IsEmpty()) {
-            MessageBox(_T("IP address should not NULL!"), _T("IP Address"), MB_ICONEXCLAMATION);
+            MessageBox(_T("IP address is NULL!"), _T("IP Address"), MB_ICONEXCLAMATION);
             m_ctrIPAddr.SetWindowText("");
             m_ctrIPAddr.SetFocus();
             return FALSE;
@@ -176,14 +191,14 @@ private:
             return FALSE;
         }
 
-		if( !ScanEsxiHost(m_hWnd, arrIP, m_strEsxiHostToken,m_iPort)){
-			MessageBox(_T("Can not START scanning thread!"), _T("Thread run"), MB_ICONEXCLAMATION);
-			return FALSE;
-		}
-		return TRUE;
-	}
-	//////////////////////////////////////////////////////////////////////////
-	
+        if (!ScanEsxiHost(m_hWnd, arrIP, m_strEsxiHostToken, m_iPort)) {
+            MessageBox(_T("Can not START scanning thread!"), _T("Thread run"), MB_ICONEXCLAMATION);
+            return FALSE;
+        }
+        return TRUE;
+    }
+    //////////////////////////////////////////////////////////////////////////
+
 public:
     enum { IDD = IDD_DIALOG_VIEW_MAIN };
 
@@ -194,7 +209,7 @@ public:
     BEGIN_MSG_MAP(CTabViewMain)
     MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
     COMMAND_ID_HANDLER(IDC_BUTTON_SCAN, OnBtnScan)
-	MESSAGE_HANDLER(MSG_ESXI_HOST_CHECK, OnCheckEsxi)
+    MESSAGE_HANDLER(MSG_ESXI_HOST_CHECK, OnCheckEsxi)
     REFLECT_NOTIFICATIONS()
     END_MSG_MAP()
 
@@ -206,9 +221,9 @@ public:
     LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
         CenterWindow(GetParent());
 
-		m_bState = E_STATE_NORMAL; 
-		
-		m_btnScan.Attach(GetDlgItem(IDC_BUTTON_SCAN));
+        m_bState = E_STATE_NORMAL;
+
+        m_btnScan.Attach(GetDlgItem(IDC_BUTTON_SCAN));
         m_ctrIPAddr.Attach(GetDlgItem(IDC_EDIT_IPADDR));
         m_ctrlEsxiHost.Attach(GetDlgItem(IDC_EDIT_ESXI_HOST));
 
@@ -218,71 +233,71 @@ public:
         return TRUE;
     }
 
-	//===========================
-	LRESULT OnCheckEsxi(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
-		int ip = (int)lParam;
-		CString strIP = Int2IPv4Str(ip);
-		CString strInfo;
-		static CSimpleValArray<int> arrHosts;
+    //===========================
+    LRESULT OnCheckEsxi(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
+        int ip = (int)lParam;
+        CString strIP = Int2IPv4Str(ip);
+        CString strInfo;
+        static CSimpleValArray<int> arrHosts;
 
-		if( wParam == OP_ESXI_CHECK_START ){
-			arrHosts.RemoveAll();
+        if (wParam == OP_ESXI_CHECK_START) {
+            arrHosts.RemoveAll();
 
-			strInfo.Format(_T("[%s] Start scanning : \r\n"),GetCurrentTimeStr());
-			
-		}else if( wParam == OP_ESXI_CHECKING){
-			strInfo.Format("Check %s ...\r\n",strIP);
-		} else if( wParam == OP_ESXI_FINDED ){
-			arrHosts.Add(ip);
-			strInfo.Format("Possible Esxi host found:  %s ...\r\n",strIP);
-		} else if( wParam == OP_ESXI_FINISHED){
-			m_btnScan.EnableWindow(TRUE); //enable the button!
-			
-			CString tmp;
-			tmp.Format(_T("[%s] Scan finished!\r\n"),GetCurrentTimeStr());
-			strInfo += tmp;
+            strInfo.Format(_T("[%s] Start scanning : \r\n"), GetCurrentTimeStr());
 
-			tmp.Format(_T("Number Esxi Host found is %d .\r\n"),arrHosts.GetSize());
-			strInfo += tmp;
-			for(int i=0;i<arrHosts.GetSize();i++){
-				strInfo += Int2IPv4Str(arrHosts[i]);
-				strInfo += _T("\r\n");
-			}
-			
-			strInfo += _T("\r\n");
-			
-			//======== restore scan button ======
-			m_btnScan.SetWindowText(_T("Scan"));
-			m_btnScan.EnableWindow(TRUE);  //enable now
-			m_bState = E_STATE_NORMAL;     //normal state!
-			//======= restore bForeStop  ========
-			bForceStop = FALSE;
+        } else if (wParam == OP_ESXI_CHECKING) {
+            strInfo.Format("Check %s ...\r\n", strIP);
+        } else if (wParam == OP_ESXI_FINDED) {
+            arrHosts.Add(ip);
+            strInfo.Format("Possible Esxi host found:  %s ...\r\n", strIP);
+        } else if (wParam == OP_ESXI_FINISHED) {
+            m_btnScan.EnableWindow(TRUE); //enable the button!
 
-		}else{
-			strInfo = _T("Unkown msg!\r\n");
-		}
-		int nLength=m_ctrlEsxiHost.SendMessage(WM_GETTEXTLENGTH);  
-		m_ctrlEsxiHost.SetSel(nLength,  nLength);  
-		m_ctrlEsxiHost.ReplaceSel(strInfo);
+            CString tmp;
+            tmp.Format(_T("[%s] Scan finished!\r\n"), GetCurrentTimeStr());
+            strInfo += tmp;
 
-		return TRUE;
-	}
+            tmp.Format(_T("Number Esxi Host found is %d .\r\n"), arrHosts.GetSize());
+            strInfo += tmp;
+            for (int i = 0; i < arrHosts.GetSize(); i++) {
+                strInfo += Int2IPv4Str(arrHosts[i]);
+                strInfo += _T("\r\n");
+            }
+
+            strInfo += _T("\r\n");
+
+            //======== restore scan button ======
+            m_btnScan.SetWindowText(_T("Scan"));
+            m_btnScan.EnableWindow(TRUE);  //enable now
+            m_bState = E_STATE_NORMAL;     //normal state!
+            //======= restore bForeStop  ========
+            bForceStop = FALSE;
+
+        } else {
+            strInfo = _T("Unkown msg!\r\n");
+        }
+        int nLength = m_ctrlEsxiHost.SendMessage(WM_GETTEXTLENGTH);
+        m_ctrlEsxiHost.SetSel(nLength,  nLength);
+        m_ctrlEsxiHost.ReplaceSel(strInfo);
+
+        return TRUE;
+    }
 
     LRESULT OnBtnScan(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
         //
 
-		if( m_bState == E_STATE_NORMAL ){
-			if( StartRunning() ){
-				m_bState = E_STATE_RUNNING;
-				m_btnScan.SetWindowText(_T("Stop"));
-			}
-		} else if( m_bState == E_STATE_RUNNING ){//
-			m_bState = E_STATE_FORCESTOP;  //force stop!
-			bForceStop = TRUE;  //request work thread to stop!
-			m_btnScan.EnableWindow(FALSE); //disable the button!
-		} else{//nothing to do!
-		}
-		
+        if (m_bState == E_STATE_NORMAL) {
+            if (StartRunning()) {
+                m_bState = E_STATE_RUNNING;
+                m_btnScan.SetWindowText(_T("Stop"));
+            }
+        } else if (m_bState == E_STATE_RUNNING) {//
+            m_bState = E_STATE_FORCESTOP;  //force stop!
+            bForceStop = TRUE;  //request work thread to stop!
+            m_btnScan.EnableWindow(FALSE); //disable the button!
+        } else { //nothing to do!
+        }
+
         return 0;
     }
 
