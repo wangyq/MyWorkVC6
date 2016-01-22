@@ -229,6 +229,10 @@ BOOL ScanEsxiHost(HWND hWnd, const CSimpleValArray<int> & arrIP, const CString s
 	if( !hWorkThread ){
 		return FALSE;
 	}
+	//Close kernel Object!
+	CloseHandle(hWorkThread);
+	hWorkThread = NULL;
+
 	return TRUE;
 }
 
