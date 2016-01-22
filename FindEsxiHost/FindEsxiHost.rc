@@ -36,7 +36,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_IPADDR,7,21,197,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Scan",IDC_BUTTON_SCAN,211,19,44,14
     LTEXT           "( 192.168.1.20-220, 192.168.1.120, 172.16.2.0/24, ...)",
-                    IDC_STATIC,42,7,205,8
+                    IDC_STATIC,35,7,174,8
 END
 
 IDD_DIALOG_VIEW_ABOUT DIALOG DISCARDABLE  0, 0, 237, 172
@@ -353,7 +353,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-//CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "res\\FindEsxiHost.exe.manifest"
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "res\\FindEsxiHost.exe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
