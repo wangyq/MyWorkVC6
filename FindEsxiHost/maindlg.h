@@ -88,7 +88,8 @@ public:
 
 	LRESULT OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 	{
-		if( !bThreadStopped ){//check if we can quit the program!
+		//if( !bThreadStopped && thePool.isRunning() ){//check if we can quit the program!
+		if( thePool.isRunning() ){//check if we can quit the program!
 			MessageBox(_T("Working Thread just running!"),_T("Exit"),MB_ICONINFORMATION);
 		} else{
 			CloseDialog(wID);

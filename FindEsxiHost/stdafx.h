@@ -36,6 +36,11 @@ extern CAppModule _Module;
 #define OP_ESXI_FINISHED  3
 #define OP_ESXI_CHECK_START 4
 
+class CWorker;
+template <class Worker> class CThreadPool;
+
+extern CThreadPool<CWorker> thePool;
+
 extern int bForceStop;
 extern int bThreadStopped ;
 

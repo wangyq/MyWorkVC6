@@ -44,11 +44,11 @@ STYLE WS_CHILD
 FONT 10, "System"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,45,14,20,20
-    CTEXT           "EsxiFinder Application \n[v1.0]\n\n(c) Copyright 2016 ",
+    CTEXT           "EsxiFinder Application \n[v1.2]\n\n(c) Copyright 2016 ",
                     IDC_STATIC,7,35,103,35
     LTEXT           "https://yinqingwang.wordpress.com",IDC_STATIC_VISIT,40,
                     85,116,8
-    LTEXT           "visit me:",IDC_STATIC,7,85,29,8
+    LTEXT           "Visit me:",IDC_STATIC,7,85,29,8
     LTEXT           "Contact: ",IDC_STATIC,7,73,29,8
     LTEXT           "yinqingwang@163.com",IDC_STATIC_MAIL,39,73,77,8
 END

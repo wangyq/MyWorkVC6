@@ -13,6 +13,8 @@
 
 #include "resource.h"
 
+#include "ThreadPool.h"
+
 #include "aboutdlg.h"
 
 #include "TabViewAbout.h"
@@ -73,28 +75,28 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
 CString GetCurrentTimeStr()
 {
-	CString strTime;
+    CString strTime;
 
-	SYSTEMTIME st;
-	GetLocalTime(&st);
-	strTime.Format(_T("%4d-%2d-%2d %2d:%2d:%2d"),st.wYear,st.wMonth,st.wDay,st.wHour,st.wMinute,st.wSecond);
-	return strTime;
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    strTime.Format(_T("%4d-%2d-%2d %2d:%2d:%2d"), st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+    return strTime;
 }
 
 int Str2Int(LPCTSTR szStr)
 {
-	int res = 0;
-	if( szStr !=0 ){
-		const TCHAR* pChar = szStr;
-		while( *pChar != _T('\0')){
-			if( (*pChar <_T('0')) || (*pChar >_T('9')) )
-				break;
-			res = res*10 + (*pChar - _T('0'));
-			pChar++;
-		}
-	}
-	
-	return res;
+    int res = 0;
+    if (szStr != 0) {
+        const TCHAR* pChar = szStr;
+        while (*pChar != _T('\0')) {
+            if ((*pChar < _T('0')) || (*pChar > _T('9')))
+                break;
+            res = res * 10 + (*pChar - _T('0'));
+            pChar++;
+        }
+    }
+
+    return res;
 }
 
 //check whether ipv4 string , for example "192.168.0.0",is valid.
@@ -169,11 +171,11 @@ BOOL IPv4StrToInt(const CString& strIP, int & ip)
     return bOK;
 }
 
-struct tagThreadParam{
-	HWND hWnd;
-	CString strToken;
-	int nPort;
-	CSimpleValArray<int> arrIP;
+struct tagThreadParam {
+    HWND hWnd;
+    CString strToken;
+    int nPort;
+    CSimpleValArray<int> arrIP;
 };
 
 int bForceStop = FALSE;     //Only set by button scan.
@@ -184,56 +186,58 @@ HANDLE hWorkThread = NULL;
 static struct tagThreadParam theParam;  //using global variable to pass parameter!
 
 //Do check every host to find whether it is a esxi host!
-DWORD WINAPI ThreadFun(LPVOID lpParam){
-	struct tagThreadParam *pParam = (struct tagThreadParam *)lpParam;
-	
-	CSimpleValArray<int> & arrIP = pParam->arrIP;
-	int nPort = pParam->nPort;
-	const CString& strToken = pParam->strToken;
-	
-	CString strResult;
+DWORD WINAPI ThreadFun(LPVOID lpParam)
+{
+    struct tagThreadParam *pParam = (struct tagThreadParam *)lpParam;
 
-	bThreadStopped = FALSE; //NOW begin
-	
-	::PostMessage(pParam->hWnd,MSG_ESXI_HOST_CHECK,OP_ESXI_CHECK_START,(LPARAM)0); //check begin
+    CSimpleValArray<int> & arrIP = pParam->arrIP;
+    int nPort = pParam->nPort;
+    const CString& strToken = pParam->strToken;
 
-	for(int i=0; (i<arrIP.GetSize()) && !bForceStop ;i++){
-		::PostMessage(pParam->hWnd,MSG_ESXI_HOST_CHECK,OP_ESXI_CHECKING,(LPARAM)arrIP[i]);
-		
-		if( !ScanEsxiHost(Int2IPv4Str(arrIP[i]).GetBuffer(15),nPort,strResult)){
-			continue;  //not found host!
-		}
-		if( strResult.Find(strToken) != -1 ){//find esxi host now!
-			::PostMessage(pParam->hWnd,MSG_ESXI_HOST_CHECK,OP_ESXI_FINDED,(LPARAM)arrIP[i]);
-		}
-	}
+    CString strResult;
 
-	::PostMessage(pParam->hWnd,MSG_ESXI_HOST_CHECK,OP_ESXI_FINISHED,(LPARAM)0);
+    bThreadStopped = FALSE; //NOW begin
 
-	bThreadStopped = TRUE; //now stopped!
+    ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_CHECK_START, (LPARAM)0); //check begin
 
-	return TRUE;
+    for (int i = 0; (i < arrIP.GetSize()) && !bForceStop ; i++) {
+        ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_CHECKING, (LPARAM)arrIP[i]);
+
+        if (!ScanEsxiHost(Int2IPv4Str(arrIP[i]).GetBuffer(15), nPort, strResult)) {
+            continue;  //not found host!
+        }
+        if (strResult.Find(strToken) != -1) {//find esxi host now!
+            ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINDED, (LPARAM)arrIP[i]);
+        }
+    }
+
+    ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINISHED, (LPARAM)0);
+
+    bThreadStopped = TRUE; //now stopped!
+
+    return TRUE;
 }
 //
-BOOL ScanEsxiHost(HWND hWnd, const CSimpleValArray<int> & arrIP, const CString strToken,int nPort){
-	theParam.hWnd = hWnd;
-	theParam.strToken = strToken;
-	theParam.nPort = nPort;
-	//theParam.arrIP = arrIP;  //here copy the arrIP
-	theParam.arrIP.RemoveAll(); //first , must remove all .
-	for(int i=0;i<arrIP.GetSize();i++){
-		theParam.arrIP.Add(arrIP[i]);
-	}
+BOOL ScanEsxiHost(HWND hWnd, const CSimpleValArray<int> & arrIP, const CString strToken, int nPort)
+{
+    theParam.hWnd = hWnd;
+    theParam.strToken = strToken;
+    theParam.nPort = nPort;
+    //theParam.arrIP = arrIP;  //here copy the arrIP
+    theParam.arrIP.RemoveAll(); //first , must remove all .
+    for (int i = 0; i < arrIP.GetSize(); i++) {
+        theParam.arrIP.Add(arrIP[i]);
+    }
 
-	hWorkThread = CreateThread(NULL,0,ThreadFun,(LPVOID)&theParam,0,&dwThreadID);
-	if( !hWorkThread ){
-		return FALSE;
-	}
-	//Close kernel Object!
-	CloseHandle(hWorkThread);
-	hWorkThread = NULL;
+    hWorkThread = CreateThread(NULL, 0, ThreadFun, (LPVOID)&theParam, 0, &dwThreadID);
+    if (!hWorkThread) {
+        return FALSE;
+    }
+    //Close kernel Object!
+    CloseHandle(hWorkThread);
+    hWorkThread = NULL;
 
-	return TRUE;
+    return TRUE;
 }
 
 
@@ -263,8 +267,8 @@ BOOL ScanEsxiHost(LPCTSTR strHost, int nPort, CString& strResult)
         closesocket(sclient);
         return FALSE;
     }
-    
-	char * sendData = "Hello world,haha!first send some data to server! \r\n";  //first send some data to server
+
+    char * sendData = "Hello world,haha!first send some data to server! \r\n";  //first send some data to server
     send(sclient, sendData, strlen(sendData), 0);
 
     char recData[MAX_MSG_SIZE + 1];
@@ -279,3 +283,42 @@ BOOL ScanEsxiHost(LPCTSTR strHost, int nPort, CString& strResult)
 
     return TRUE;
 }
+
+//==
+CWorker::ThreadParam CWorker::theWorkerParam;
+
+void CWorker::Execute(
+    int request,
+    void *pvWorkerParam,
+    OVERLAPPED *pOverlapped)
+{
+    CWorker::PThreadParam pParam = (CWorker::PThreadParam)pvWorkerParam;
+
+    CString strResult = "";
+    CString strHost = Int2IPv4Str(request);
+    ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_CHECKING, (LPARAM)request);
+    if (ScanEsxiHost(strHost.GetBuffer(15), pParam->nPort, strResult)) {
+        if (strResult.Find(pParam->strToken) != -1) {//find esxi host now!
+            ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINDED, (LPARAM)request);
+        }
+    }
+
+
+}
+
+BOOL CWorker::Initialize(void * pvWorkerParam, bool bFirstStartup)
+{
+    if (bFirstStartup) {
+        CWorker::PThreadParam pParam = (CWorker::PThreadParam)pvWorkerParam;
+        ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_CHECK_START, (LPARAM)0);
+    }
+    return TRUE;
+}
+void CWorker::Terminate(void* pvWorkerParam , bool bLastExecute)
+{
+    if (bLastExecute) {
+        CWorker::PThreadParam pParam = (CWorker::PThreadParam)pvWorkerParam;
+        ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINISHED, (LPARAM)0);
+    }
+}
+CThreadPool<CWorker> thePool;

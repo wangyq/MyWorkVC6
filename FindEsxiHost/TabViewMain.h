@@ -9,6 +9,27 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+class CWorker:public CWorkerBase<int, true,0>{ //autoexit = true, exit request = 0
+public:
+	typedef struct tagThreadParam{
+		HWND hWnd;
+		CString strToken;
+		int nPort;		
+	}ThreadParam,*PThreadParam;
+static ThreadParam theWorkerParam;
+
+public:
+
+	BOOL Initialize(void * /*pvParam*/, bool bFirstStartup = false) ;
+
+	void Execute(
+		 RequestType request,
+		 void *pvWorkerParam,
+		 OVERLAPPED *pOverlapped);
+	
+	void Terminate(void* /*pvParam*/ , bool bLastExecute = false);
+
+};
 
 class CTabViewMain : public CDialogImpl<CTabViewMain>
 {
@@ -191,10 +212,23 @@ private:
             return FALSE;
         }
 
-        if (!ScanEsxiHost(m_hWnd, arrIP, m_strEsxiHostToken, m_iPort)) {
+        /*if (!ScanEsxiHost(m_hWnd, arrIP, m_strEsxiHostToken, m_iPort)) {
             MessageBox(_T("Can not START scanning thread!"), _T("Thread run"), MB_ICONEXCLAMATION);
             return FALSE;
-        }
+        }*/
+		
+		if( !thePool.Start(arrIP.GetSize()) ){
+			MessageBox(_T("Can not START scanning thread!"), _T("Thread run"), MB_ICONEXCLAMATION);
+            return FALSE;
+		}
+		
+		::PostMessage(m_hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_CHECK_START, (LPARAM)0); //check begin
+
+		arrIP.Add(0);// end flags
+		for(int i=0;i<arrIP.GetSize();i++){
+			thePool.AddWorkerRequest(arrIP[i]);
+		}
+
         return TRUE;
     }
     //////////////////////////////////////////////////////////////////////////
@@ -229,6 +263,15 @@ public:
 
         LoadTokenAndPort(); //load token and port to scan for.
 
+
+		//==
+		CWorker::theWorkerParam.hWnd = m_hWnd;
+		CWorker::theWorkerParam.strToken = m_strEsxiHostToken;
+		CWorker::theWorkerParam.nPort = m_iPort;
+
+		SYSTEM_INFO si;  
+		GetSystemInfo(&si);
+		thePool.Initialize((si.dwNumberOfProcessors)*2+2,(void*)(&(CWorker::theWorkerParam)));
 
         return TRUE;
     }
@@ -285,7 +328,15 @@ public:
 
     LRESULT OnBtnScan(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
         //
+		//thePool.Start();
 
+		/*for(int i=0;i<10;i++){
+			thePool.AddWorkerRequest(i);
+		}
+		thePool.Start();
+		thePool.PostWorkerEndRequest();
+		*/
+	
         if (m_bState == E_STATE_NORMAL) {
             if (StartRunning()) {
                 m_bState = E_STATE_RUNNING;
@@ -294,6 +345,7 @@ public:
         } else if (m_bState == E_STATE_RUNNING) {//
             m_bState = E_STATE_FORCESTOP;  //force stop!
             bForceStop = TRUE;  //request work thread to stop!
+			thePool.Stop();     //force stop
             m_btnScan.EnableWindow(FALSE); //disable the button!
         } else { //nothing to do!
         }

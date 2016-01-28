@@ -137,6 +137,10 @@ SOURCE=.\TabViewMain.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\ThreadPool.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\WTLTabViewCtrl.h
 # End Source File
 # End Group
