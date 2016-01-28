@@ -151,13 +151,14 @@ protected:
 				if (pOverlapped != THREAD_POOL_SHUTDOWN){
 					continue;  //fetch next until reach THREAD_POOL_SHUTDOWN
 				}
+				
+				//mark thread end here!
+				m_bThreadMark &= (~(1 << nThreadIndex));
+
 				if( isLastThread(nThreadIndex) ){
 					bLastTerminate = true;
 					//theWorker.ExecuteLast(m_pvWorkerParam,m_bForcedStop);
 				}else{//finished one by one!
-					
-					//mark thread end here!
-					m_bThreadMark &= (~(1 << nThreadIndex));
 					PostQueuedCompletionStatus(m_hRequestQueue, 0, 0, THREAD_POOL_SHUTDOWN);
 				}
 				break;
@@ -174,12 +175,15 @@ protected:
                 Worker::RequestType request = (Worker::RequestType) dwCompletionKey;
 				if( Worker::isAutoExitThread()){
 					if( request == Worker::GetAutoExitRequest() ) {//can we make sure this is just running only once?
+						
+						//mark thread end here!
+						m_bThreadMark &= (~(1 << nThreadIndex));
+
 						if( isLastThread(nThreadIndex) ){
 							bLastTerminate = true;
-							theWorker.Execute(request, m_pvWorkerParam, pOverlapped);
+							//theWorker.Execute(request, m_pvWorkerParam, pOverlapped);
 						} else{
-							//mark thread end here!
-							m_bThreadMark &= (~(1 << nThreadIndex));
+							
 							AddWorkerRequest(request); //chain react!
 						}
 						break;
