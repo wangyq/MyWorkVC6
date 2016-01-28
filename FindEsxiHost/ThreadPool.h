@@ -332,8 +332,8 @@ template<class T, bool bAutoExit=false, T EndRequest = 0>
 class CWorkerBase{
 public:
 	typedef T RequestType;
-	typedef T ThreadParam;
-	typedef T* PThreadParam;
+	//typedef T ThreadParam;
+	//typedef T* PThreadParam;
 
 public:
 	static bool isAutoExitThread(){
