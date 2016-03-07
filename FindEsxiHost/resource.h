@@ -13,10 +13,10 @@
 #define IDC_BUTTON_SCAN                 1004
 #define IDC_STATIC_VISIT                1005
 #define IDC_STATIC_MAIL                 1007
-#define IDC_PROGRESS1                   1008
-#define IDC_SLIDER1                     1009
+#define IDC_STATIC_VERSION              1010
 #define IDS_ESXI_HOST_PORT              61403
 #define IDS_ESXI_HOST_TOKEN             61404
+#define IDS_THIS_VERSION                61405
 
 // Next default values for new objects
 // 
@@ -24,7 +24,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        205
 #define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         1010
+#define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

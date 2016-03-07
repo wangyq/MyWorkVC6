@@ -58,8 +58,10 @@ public:
 		SetIcon(hIconSmall, FALSE);
 
 		m_tabMain.SubclassWindow(GetDlgItem(IDC_TAB_MAIN));
-		m_tabMain.AddTabMain();
-		m_tabMain.AddTabAbout();
+		m_tabMain.Init();
+		
+		//m_tabMain.AddTabMain();
+		//m_tabMain.AddTabAbout();
 
 		// register object for message filtering and idle updates
 		CMessageLoop* pLoop = _Module.GetMessageLoop();

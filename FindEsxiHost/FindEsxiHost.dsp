@@ -92,6 +92,10 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\BitArray.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\FindEsxiHost.cpp
 # End Source File
 # Begin Source File
@@ -110,6 +114,10 @@ SOURCE=.\stdafx.cpp
 # Begin Source File
 
 SOURCE=.\aboutdlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\BitArray.h
 # End Source File
 # Begin Source File
 

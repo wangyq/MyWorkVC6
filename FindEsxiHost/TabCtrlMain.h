@@ -24,6 +24,9 @@ protected:
 			VIEW_END
 		};
 
+	CTabViewMain m_pageMain;
+	CTabViewAbout m_pageAbout;
+	
 
 	//==============================================================================
 	//	WTL
@@ -56,7 +59,19 @@ public:
 	{
 	}
 
-		void AddTabMain( )
+	void Init()
+	{
+		m_pageMain.Create(m_hWnd);
+		AddTab(_T("Esxi Find"),m_pageMain);
+
+		m_pageAbout.Create(m_hWnd);
+		AddTab(_T("About"),m_pageAbout);
+
+		//
+		SetActiveTab(0);
+	}
+	/*
+	void AddTabMain( )
 		{
 			TCHAR inTabName[] = _T("Esxi Find");
 			
@@ -74,6 +89,7 @@ public:
 
 			AddTab( inTabName, *theView, FALSE, VIEW_ABOUT, (LPARAM) theView );
 		}
+		*/
 };
 
 #endif // !defined(AFX_TABCTRLMAIN_H__01D6B306_3599_4C31_9AF9_2FDC113FD0B6__INCLUDED_)

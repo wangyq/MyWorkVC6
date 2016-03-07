@@ -38,6 +38,13 @@ public:
     LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
         CenterWindow(GetParent());
 
+		CString strVersion;
+		strVersion.LoadString(IDS_THIS_VERSION);
+		
+		CStatic m_ctrlVerson;
+		m_ctrlVerson.Attach(GetDlgItem(IDC_STATIC_VERSION));
+		m_ctrlVerson.SetWindowText(strVersion);
+
 		m_ctrlLink.SubclassWindow(GetDlgItem(IDC_STATIC_VISIT));
 		m_ctrlLink.SetHyperLink(_T("https://yinqingwang.wordpress.com"));
 		

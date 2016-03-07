@@ -2,6 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "BitArray.h"
+
 #if !defined(AFX_THREADPOOL_H__51CA8967_7888_4D38_A831_26EDFC5C73E0__INCLUDED_)
 #define AFX_THREADPOOL_H__51CA8967_7888_4D38_A831_26EDFC5C73E0__INCLUDED_
 
@@ -17,12 +19,16 @@ class CThreadPool
 
 protected:
     enum {
-        ENUM_MAX_THREAD_NUM = 32,
+        ENUM_MAX_THREAD_NUM = 64,
+		ENUM_THREADNUM_PER_CORE = 64,
         ENUM_END
     };
 	int m_bForcedStop;
 
-    int m_bThreadMark;
+    //int m_bThreadMark;
+	CBitArray m_bThreadMark;
+	
+	unsigned int m_nMaxThreadNum;
     unsigned int m_nThreadNum ;
     unsigned int m_nCurThreadIndex ;
     unsigned int m_dwMaxWaitMilliseconds ;
@@ -115,15 +121,18 @@ protected:
 #endif
 	
 	BOOL isFirsThread(int index){
-		if( (index <0) || (index >=ENUM_MAX_THREAD_NUM) ) return FALSE;
-		int mask = ~(1<<index);
-		return (m_bThreadMark & mask) == 0 ;
+		//if( (index <0) || (index >=ENUM_MAX_THREAD_NUM) ) return FALSE;
+		//int mask = ~(1<<index);
+		//return (m_bThreadMark & mask) == 0 ;
+		return m_bThreadMark.isOtherClear(index);
 	}
 	//
 	BOOL isLastThread(int index){
-		if( (index <0) || (index >=ENUM_MAX_THREAD_NUM) ) return FALSE;
-		int mask = ~(1<<index);
-		return (m_bThreadMark & mask) == 0 ;
+		//if( (index <0) || (index >=ENUM_MAX_THREAD_NUM) ) return FALSE;
+		//int mask = ~(1<<index);
+		//return (m_bThreadMark & mask) == 0 ;
+
+		return m_bThreadMark.isOtherClear(index);
 	}
     //==
     int ThreadProc() {
@@ -142,8 +151,10 @@ protected:
             return 1;
         }
 
-        //== mark thread
-        m_bThreadMark |= (1 << nThreadIndex);
+        //== mark thread running
+        //m_bThreadMark |= (1 << nThreadIndex);
+		m_bThreadMark.Set(nThreadIndex);
+
         SetEvent(m_hThreadEvent); //tell that is running now!
 
         while (GetQueuedCompletionStatus(m_hRequestQueue, &dwBytesTransfered, &dwCompletionKey, &pOverlapped, INFINITE)) {
@@ -153,7 +164,8 @@ protected:
 				}
 				
 				//mark thread end here!
-				m_bThreadMark &= (~(1 << nThreadIndex));
+				//m_bThreadMark &= (~(1 << nThreadIndex));
+				m_bThreadMark.Clear(nThreadIndex);
 
 				if( isLastThread(nThreadIndex) ){
 					bLastTerminate = true;
@@ -177,7 +189,8 @@ protected:
 					if( request == Worker::GetAutoExitRequest() ) {//can we make sure this is just running only once?
 						
 						//mark thread end here!
-						m_bThreadMark &= (~(1 << nThreadIndex));
+						//m_bThreadMark &= (~(1 << nThreadIndex));
+						m_bThreadMark.Clear(nThreadIndex);
 
 						if( isLastThread(nThreadIndex) ){
 							bLastTerminate = true;
@@ -243,30 +256,38 @@ public:
         m_dwMaxWaitMilliseconds = 600;
         m_nCurThreadIndex = 0;
         m_pvWorkerParam = NULL;
+		m_nMaxThreadNum = ENUM_MAX_THREAD_NUM;
+		m_bThreadMark.SetSize(m_nMaxThreadNum);
         m_nThreadNum = 0;
 		m_bForcedStop = 0;
     }
     virtual ~CThreadPool() {
 		ShutDown();
     }
-
-public:
+/**************************
+*
+*
+**************************/
+ public:
     //==
     BOOL isStopped() {
-        return m_bThreadMark == 0;
+        //return m_bThreadMark == 0;
+		return m_bThreadMark.isEmpty();
     }
     BOOL isRunning() {
-        return m_bThreadMark != 0;
+        //return m_bThreadMark != 0;
+		return !(m_bThreadMark.isEmpty());
     }
     //==
-    BOOL Start(int nThreadNum = 0) {
+    BOOL Start(unsigned int nThreadNum = 0) {
 		if( isRunning() ) return TRUE;
 
-		if( (nThreadNum>0) && (nThreadNum<=ENUM_MAX_THREAD_NUM)){//set thread number
+		if( nThreadNum>m_nMaxThreadNum ){
+			m_nThreadNum = m_nMaxThreadNum;
+		} else if( nThreadNum>0 ){
 			m_nThreadNum = nThreadNum;
-		} else if( nThreadNum>ENUM_MAX_THREAD_NUM ){
-			m_nThreadNum = ENUM_MAX_THREAD_NUM;
-		} else{
+		}
+		else{
 			;//nothing to do!
 		}
 		m_bForcedStop = 0;  //no set force stop!
@@ -291,8 +312,16 @@ public:
         return TRUE;
     }
 
-	//==
-	BOOL Initialize( void *pvWorkerParam = NULL) {
+    //==
+    BOOL Initialize(void *pvWorkerParam = NULL, int nNumCores=0) {
+		//==
+		if( nNumCores>0 )
+		{
+			m_nMaxThreadNum = nNumCores * ENUM_THREADNUM_PER_CORE;
+			m_bThreadMark.SetSize(m_nMaxThreadNum);
+			m_bThreadMark.ClearAll();
+		}
+
 		// Automatic reset Event!
         m_hThreadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
         if (!m_hThreadEvent) {
@@ -310,14 +339,7 @@ public:
         m_pvWorkerParam = pvWorkerParam;
 
         return TRUE;
-	}
-    //==
-    BOOL Initialize(int nThreadNum, void *pvWorkerParam = NULL) {
-		//==
-        nThreadNum = (nThreadNum > ENUM_MAX_THREAD_NUM) ? ENUM_MAX_THREAD_NUM : nThreadNum;
-        m_nThreadNum = nThreadNum;
 
-        return Initialize(pvWorkerParam);
     }
     //==
     BOOL AddWorkerRequest(typename Worker::RequestType request) {

@@ -9,6 +9,18 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+template <class T>
+class CMySimpleValArray : public CSimpleValArray< T >
+{
+public:
+	void SetAt(int nIndex, T val)
+	{
+		ATLASSERT(nIndex >= 0 && nIndex < m_nSize);
+		m_aT[nIndex] = val;
+	}
+};
+
+
 class CWorker:public CWorkerBase<int, true,0>{ //autoexit = true, exit request = 0
 public:
 	typedef struct tagThreadParam{
@@ -17,6 +29,7 @@ public:
 		int nPort;		
 	}ThreadParam,*PThreadParam;
 static ThreadParam theWorkerParam;
+
 
 public:
 
@@ -28,7 +41,7 @@ public:
 		 OVERLAPPED *pOverlapped);
 	
 	void Terminate(void* /*pvParam*/ , bool bLastExecute = false);
-
+	
 };
 
 class CTabViewMain : public CDialogImpl<CTabViewMain>
@@ -73,6 +86,30 @@ private:
             m_strEsxiHostToken = CString(TOKEN);
         }
     }
+
+	/****************************************
+	* bubble sort
+	*/
+	void InsertHosts(CMySimpleValArray<int> & arrHosts, int ip)
+	{
+		arrHosts.Add(ip); //allocate space!
+
+		//bubble sort
+		int i=0;
+		for( i=arrHosts.GetSize()-1-1; i>=0;i--){
+			int val = arrHosts[i];
+			if( (unsigned int) val > (unsigned int) ip ){  //compare with unsigned int value.
+				arrHosts.SetAt(i+1, val);
+			} else{
+				//arrHosts.SetAt(i+1, ip);
+				break;  //finished loop!
+			}
+		}// end of for
+
+		arrHosts.SetAt(i+1, ip);
+		
+	}
+
 #if 0
     //Split string
     //wrong method, the element of  Array CString is temporatly variable!
@@ -222,7 +259,7 @@ private:
             return FALSE;
 		}
 		
-		::PostMessage(m_hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_CHECK_START, (LPARAM)0); //check begin
+		//::PostMessage(m_hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_CHECK_START, (LPARAM)0); //check begin
 
 		arrIP.Add(0);// end flags
 		for(int i=0;i<arrIP.GetSize();i++){
@@ -271,7 +308,7 @@ public:
 
 		SYSTEM_INFO si;  
 		GetSystemInfo(&si);
-		thePool.Initialize((si.dwNumberOfProcessors)*2+2,(void*)(&(CWorker::theWorkerParam)));
+		thePool.Initialize((void*)(&(CWorker::theWorkerParam)),si.dwNumberOfProcessors);
 
         return TRUE;
     }
@@ -281,17 +318,19 @@ public:
         int ip = (int)lParam;
         CString strIP = Int2IPv4Str(ip);
         CString strInfo;
-        static CSimpleValArray<int> arrHosts;
+        static CMySimpleValArray<int> arrHosts;
 
         if (wParam == OP_ESXI_CHECK_START) {
-            arrHosts.RemoveAll();
+			arrHosts.RemoveAll();
 
             strInfo.Format(_T("[%s] Start scanning : \r\n"), GetCurrentTimeStr());
 
         } else if (wParam == OP_ESXI_CHECKING) {
             strInfo.Format("Check %s ...\r\n", strIP);
         } else if (wParam == OP_ESXI_FINDED) {
-            arrHosts.Add(ip);
+            //arrHosts.Add(ip);
+			InsertHosts(arrHosts,ip); // increment insert
+
             strInfo.Format("Possible Esxi host found:  %s ...\r\n", strIP);
         } else if (wParam == OP_ESXI_FINISHED) {
             m_btnScan.EnableWindow(TRUE); //enable the button!
@@ -300,7 +339,7 @@ public:
             tmp.Format(_T("[%s] Scan finished!\r\n"), GetCurrentTimeStr());
             strInfo += tmp;
 
-            tmp.Format(_T("Number Esxi Host found is %d .\r\n"), arrHosts.GetSize());
+            tmp.Format(_T("==> Number Esxi Host found is %d .\r\n"), arrHosts.GetSize());
             strInfo += tmp;
             for (int i = 0; i < arrHosts.GetSize(); i++) {
                 strInfo += Int2IPv4Str(arrHosts[i]);
