@@ -19,7 +19,8 @@ class CThreadPool
 
 protected:
     enum {
-        ENUM_DEFAULT_MAX_THREAD_NUM = 128,  //ONE core's thread num 
+		ENUM_TIMEOUT_MILIISECOND = 600, 
+        ENUM_DEFAULT_MAX_THREAD_NUM = 256,  //ONE core's thread num 
 		ENUM_THREADNUM_PER_CORE = 128,
 		ENUM_SYSTEM_MAX_THREAD_NUM = 8* (1<<10),  //
         ENUM_END
@@ -27,8 +28,9 @@ protected:
 	int m_bForcedStop;
 
     //int m_bThreadMark;
-	CBitArray m_bThreadMark;
+	//CBitArray m_bThreadMark;
 	
+	unsigned int m_nThreadNumPerCore;
 	unsigned int m_nMaxThreadNum;
     unsigned int m_nThreadNum ;
     unsigned int m_nCurThreadIndex ;
@@ -40,8 +42,9 @@ protected:
         DWORD dwThreadID = 0;
         HANDLE hThread = NULL;
 
+		m_nCurThreadIndex = 0; //it's value will be changed by worker's thread process.
         for (unsigned int i = 0; i < m_nThreadNum; i++) {
-            m_nCurThreadIndex = i;
+            //m_nCurThreadIndex = i;
 
             // start each thread one by one!
             ResetEvent(m_hThreadEvent);
@@ -120,26 +123,30 @@ protected:
         return bOK;
     }
 #endif
-	
-	BOOL isFirsThread(int index){
+	/*
+	bool isFirsThread( ){
 		//if( (index <0) || (index >=ENUM_MAX_THREAD_NUM) ) return FALSE;
 		//int mask = ~(1<<index);
 		//return (m_bThreadMark & mask) == 0 ;
-		return m_bThreadMark.isOtherClear(index);
+		//return m_bThreadMark.isOtherClear(index);
+		return m_nCurThreadIndex == 0;
 	}
 	//
-	BOOL isLastThread(int index){
+	bool isLastThread( ){
 		//if( (index <0) || (index >=ENUM_MAX_THREAD_NUM) ) return FALSE;
 		//int mask = ~(1<<index);
 		//return (m_bThreadMark & mask) == 0 ;
 
-		return m_bThreadMark.isOtherClear(index);
+		//return m_bThreadMark.isOtherClear(index);
+		return m_nCurThreadIndex == 0;
 	}
+	*/
+	
     //==
     int ThreadProc() {
-        int nThreadIndex = m_nCurThreadIndex;
+        int nThreadIndex = m_nCurThreadIndex; //local variable, this thread's thread index!
 		bool bLastTerminate = false;
-		bool bFirstRun = (nThreadIndex==0)?true:false;
+		bool bFirstRun = (m_nCurThreadIndex == 0);//isFirsThread(  ); //(nThreadIndex==0)?true:false;
 
         DWORD dwBytesTransfered;
         ULONG_PTR dwCompletionKey;
@@ -154,7 +161,8 @@ protected:
 
         //== mark thread running
         //m_bThreadMark |= (1 << nThreadIndex);
-		m_bThreadMark.Set(nThreadIndex);
+		//m_bThreadMark.Set(nThreadIndex);
+		m_nCurThreadIndex ++;
 
         SetEvent(m_hThreadEvent); //tell that is running now!
 
@@ -166,9 +174,11 @@ protected:
 				
 				//mark thread end here!
 				//m_bThreadMark &= (~(1 << nThreadIndex));
-				m_bThreadMark.Clear(nThreadIndex);
+				//m_bThreadMark.Clear(nThreadIndex);
+				m_nCurThreadIndex -- ;
 
-				if( isLastThread(nThreadIndex) ){
+				//if( isLastThread() ){
+				if( m_nCurThreadIndex == 0){
 					bLastTerminate = true;
 					//theWorker.ExecuteLast(m_pvWorkerParam,m_bForcedStop);
 				}else{//finished one by one!
@@ -191,13 +201,14 @@ protected:
 						
 						//mark thread end here!
 						//m_bThreadMark &= (~(1 << nThreadIndex));
-						m_bThreadMark.Clear(nThreadIndex);
+						//m_bThreadMark.Clear(nThreadIndex);
+						m_nCurThreadIndex -- ;
 
-						if( isLastThread(nThreadIndex) ){
+						//if( isLastThread() ){
+						if( m_nCurThreadIndex == 0){
 							bLastTerminate = true;
 							//theWorker.Execute(request, m_pvWorkerParam, pOverlapped);
 						} else{
-							
 							AddWorkerRequest(request); //chain react!
 						}
 						break;
@@ -253,12 +264,13 @@ public:
     }
     // ==
     CThreadPool(): m_hRequestQueue(NULL), m_hThreadEvent(NULL) {
-        m_bThreadMark = 0;
-        m_dwMaxWaitMilliseconds = 600;
+        m_dwMaxWaitMilliseconds = ENUM_TIMEOUT_MILIISECOND; //600
         m_nCurThreadIndex = 0;
         m_pvWorkerParam = NULL;
 		m_nMaxThreadNum = ENUM_DEFAULT_MAX_THREAD_NUM;
-		m_bThreadMark.SetSize(m_nMaxThreadNum);
+		m_nThreadNumPerCore = ENUM_THREADNUM_PER_CORE;
+		//m_bThreadMark = 0;
+		//m_bThreadMark.SetSize(m_nMaxThreadNum);
         m_nThreadNum = 0;
 		m_bForcedStop = 0;
     }
@@ -273,15 +285,17 @@ public:
     //==
     BOOL isStopped() {
         //return m_bThreadMark == 0;
-		return m_bThreadMark.isEmpty();
+		//return m_bThreadMark.isEmpty();
+		return m_nCurThreadIndex <=0;
     }
     BOOL isRunning() {
         //return m_bThreadMark != 0;
-		return !(m_bThreadMark.isEmpty());
+		//return !(m_bThreadMark.isEmpty());
+		return m_nCurThreadIndex > 0;
     }
     //==
     BOOL Start(unsigned int nThreadNum = 0) {
-		if( isRunning() ) return TRUE;
+		if( isRunning() ) return FALSE;  //here return TRUE or FALSE ?
 
 		if( nThreadNum>m_nMaxThreadNum ){
 			m_nThreadNum = m_nMaxThreadNum;
@@ -303,8 +317,13 @@ public:
         hThread = NULL;
         return TRUE;
     }
+	/****************************************
+	* This function should be called only once!
+	* Because it stop threadpool's thread one by one using chain technology.
+	* 
+	*/
     BOOL Stop() {//force stop
-        if (isRunning()) {
+        if (isRunning() && (!m_bForcedStop) ) {
 			m_bForcedStop = 1; //force stop now!
 			//chain one by one to stop!
 			PostQueuedCompletionStatus(m_hRequestQueue, 0, 0, THREAD_POOL_SHUTDOWN);
@@ -314,15 +333,18 @@ public:
     }
 
     //==
-    BOOL Initialize(void *pvWorkerParam = NULL, int nNumCores=0) {
+    BOOL Initialize(void *pvWorkerParam = NULL, int nNumCores=0, int nThreadNumPerCore=0) {
 		//==
+		if( nThreadNumPerCore>0 ){
+			m_nThreadNumPerCore = nThreadNumPerCore;
+		}
 		if( nNumCores>0 )
 		{
-			m_nMaxThreadNum = nNumCores * ENUM_THREADNUM_PER_CORE;
+			m_nMaxThreadNum = nNumCores * m_nThreadNumPerCore;
 			m_nMaxThreadNum = m_nMaxThreadNum<ENUM_SYSTEM_MAX_THREAD_NUM ? m_nMaxThreadNum: ENUM_SYSTEM_MAX_THREAD_NUM; //
 			
-			m_bThreadMark.SetSize(m_nMaxThreadNum);
-			m_bThreadMark.ClearAll();
+			//m_bThreadMark.SetSize(m_nMaxThreadNum);
+			//m_bThreadMark.ClearAll();
 		}
 
 		// Automatic reset Event!

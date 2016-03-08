@@ -310,9 +310,14 @@ public:
 		CWorker::theWorkerParam.strToken = m_strEsxiHostToken;
 		CWorker::theWorkerParam.nPort = m_iPort;
 
+		//
+		CString strNumPerCore;
+		strNumPerCore.LoadString(IDS_THREAD_NUMBER_PER_CORE);
+		int nNumPerCore = Str2Int(strNumPerCore);
+		
 		SYSTEM_INFO si;  
 		GetSystemInfo(&si);
-		thePool.Initialize((void*)(&(CWorker::theWorkerParam)),si.dwNumberOfProcessors);
+		thePool.Initialize((void*)(&(CWorker::theWorkerParam)),si.dwNumberOfProcessors, nNumPerCore);
 
         return TRUE;
     }
@@ -404,6 +409,20 @@ public:
         return 0;
     }
 
+	bool CanExit(){
+		bool bOk = false;
+		if (m_bState == E_STATE_NORMAL) {
+			bOk = true;
+		}else if (m_bState == E_STATE_RUNNING) {//
+			MessageBox(_T("Worker Thread is running! Please stop it first!"),_T("Stop"),MB_ICONEXCLAMATION|MB_OKCANCEL);
+		}else if (m_bState == E_STATE_FORCESTOP) {//
+			MessageBox(_T("Worker Thread is stopping! Please wait a second."),_T("Exit"),MB_ICONINFORMATION);
+		} else{//unkown state
+			bOk = true;
+		}
+
+		return bOk;
+	}
 };
 
 #endif // !defined(AFX_TABVIEWMAIN_H__0919917A_46B8_4415_89C7_90F3C93E6FB4__INCLUDED_)

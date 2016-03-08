@@ -6,6 +6,28 @@
 --------------------Configuration: FindEsxiHost - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP11C.tmp" with contents
+[
+/nologo /MT /W3 /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "STRICT" /FR"Release/" /Fp"Release/FindEsxiHost.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\000\VC\MyWorkVC6\FindEsxiHost\FindEsxiHost.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP11C.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP11D.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/EsxiFinder.pdb" /machine:I386 /out:"Release/EsxiFinder.exe" 
+.\Release\BitArray.obj
+.\Release\FindEsxiHost.obj
+.\Release\stdafx.obj
+.\Release\FindEsxiHost.res
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP11D.tmp"
+<h3>Output Window</h3>
+Compiling...
+FindEsxiHost.cpp
+Linking...
+Creating command line "bscmake.exe /nologo /o"Release/FindEsxiHost.bsc"  .\Release\stdafx.sbr .\Release\BitArray.sbr .\Release\FindEsxiHost.sbr"
+Creating browse info file...
+<h3>Output Window</h3>
 
 
 

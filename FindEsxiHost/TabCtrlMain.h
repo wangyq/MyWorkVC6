@@ -90,6 +90,9 @@ public:
 			AddTab( inTabName, *theView, FALSE, VIEW_ABOUT, (LPARAM) theView );
 		}
 		*/
+	bool CanExit(){
+		return m_pageMain.CanExit();
+	}
 };
 
 #endif // !defined(AFX_TABCTRLMAIN_H__01D6B306_3599_4C31_9AF9_2FDC113FD0B6__INCLUDED_)
