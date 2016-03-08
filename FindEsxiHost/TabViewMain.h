@@ -52,6 +52,8 @@ private:
         E_STATE_NORMAL = 1,
         E_STATE_RUNNING = 2,
         E_STATE_FORCESTOP = 3,
+		E_INCREMENT_OUTPUT_BUFFER = (1<<20),   // 1M,the CEdit output buffer Increment.
+		E_INCREMENT_OUTPUT_BUFFER_MAX = 8*(1<<20), //8M MAX output buffer.
         E_STATE_END
     };
 
@@ -296,7 +298,9 @@ public:
 
         m_btnScan.Attach(GetDlgItem(IDC_BUTTON_SCAN));
         m_ctrIPAddr.Attach(GetDlgItem(IDC_EDIT_IPADDR));
+
         m_ctrlEsxiHost.Attach(GetDlgItem(IDC_EDIT_ESXI_HOST));
+		//m_ctrlEsxiHost.SetLimitText(0); //set maximum buffer size!
 
         LoadTokenAndPort(); //load token and port to scan for.
 
@@ -359,6 +363,14 @@ public:
             strInfo = _T("Unkown msg!\r\n");
         }
         int nLength = m_ctrlEsxiHost.SendMessage(WM_GETTEXTLENGTH);
+		int nLimit = m_ctrlEsxiHost.GetLimitText();
+		if( nLimit - nLength < strInfo.GetLength() ){ //Clear output content!
+			//int nMax = (nLimit + E_INCREMENT_OUTPUT_BUFFER) ;
+			//nMax = nMax < E_INCREMENT_OUTPUT_BUFFER_MAX? nMax: E_INCREMENT_OUTPUT_BUFFER_MAX;
+			m_ctrlEsxiHost.SetWindowText(_T(""));
+			//m_ctrlEsxiHost.SetLimitText(nMax); //incrment buffer size!
+			nLength = 0;//
+		}
         m_ctrlEsxiHost.SetSel(nLength,  nLength);
         m_ctrlEsxiHost.ReplaceSel(strInfo);
 

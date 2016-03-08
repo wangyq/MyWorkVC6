@@ -19,8 +19,9 @@ class CThreadPool
 
 protected:
     enum {
-        ENUM_MAX_THREAD_NUM = 64,
-		ENUM_THREADNUM_PER_CORE = 64,
+        ENUM_DEFAULT_MAX_THREAD_NUM = 128,  //ONE core's thread num 
+		ENUM_THREADNUM_PER_CORE = 128,
+		ENUM_SYSTEM_MAX_THREAD_NUM = 8* (1<<10),  //
         ENUM_END
     };
 	int m_bForcedStop;
@@ -256,7 +257,7 @@ public:
         m_dwMaxWaitMilliseconds = 600;
         m_nCurThreadIndex = 0;
         m_pvWorkerParam = NULL;
-		m_nMaxThreadNum = ENUM_MAX_THREAD_NUM;
+		m_nMaxThreadNum = ENUM_DEFAULT_MAX_THREAD_NUM;
 		m_bThreadMark.SetSize(m_nMaxThreadNum);
         m_nThreadNum = 0;
 		m_bForcedStop = 0;
@@ -318,6 +319,8 @@ public:
 		if( nNumCores>0 )
 		{
 			m_nMaxThreadNum = nNumCores * ENUM_THREADNUM_PER_CORE;
+			m_nMaxThreadNum = m_nMaxThreadNum<ENUM_SYSTEM_MAX_THREAD_NUM ? m_nMaxThreadNum: ENUM_SYSTEM_MAX_THREAD_NUM; //
+			
 			m_bThreadMark.SetSize(m_nMaxThreadNum);
 			m_bThreadMark.ClearAll();
 		}
