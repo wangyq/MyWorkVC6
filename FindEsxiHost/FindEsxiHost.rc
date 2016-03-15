@@ -347,7 +347,7 @@ BEGIN
     IDS_ESXI_HOST_PORT      "902"
     IDS_ESXI_HOST_TOKEN     "VMware"
     IDS_THIS_VERSION        "Version 1.3.0 Final Build-201603062400"
-    IDS_THREAD_NUMBER_PER_CORE "1024"
+    IDS_THREAD_NUMBER_PER_CORE "256"
 END
 
 #endif    // English (U.S.) resources
