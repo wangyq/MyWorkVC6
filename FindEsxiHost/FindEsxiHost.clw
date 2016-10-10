@@ -11,10 +11,10 @@ LastPage=0
 ClassCount=1
 
 ResourceCount=5
-Resource1=IDD_MAINDLG (English (U.S.))
-Resource2=IDD_DIALOG_VIEW_ABOUT
-Resource3=IDD_DIALOG_VIEW_MAIN
-Resource4=IDD_ABOUTBOX (English (U.S.))
+Resource1=IDD_ABOUTBOX (English (U.S.))
+Resource2=IDD_MAINDLG (English (U.S.))
+Resource3=IDD_DIALOG_VIEW_ABOUT
+Resource4=IDD_DIALOG_VIEW_MAIN
 Class1=CTabViewAbout
 Resource5=IDR_MAINFRAME (English (U.S.))
 

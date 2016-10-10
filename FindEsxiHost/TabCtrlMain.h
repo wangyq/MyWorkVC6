@@ -70,6 +70,22 @@ public:
 		//
 		SetActiveTab(0);
 	}
+	// handle OK message from parent windows
+	void OnOK()
+	{
+//		HWND hActiveWnd = GetActiveTab();
+//		if( hActiveWnd == m_pageMain.m_hWnd )
+//		{//Do process main tab view message!
+//			::MessageBox(NULL,_T("°´Å¥OK"),NULL,NULL);
+//		}
+
+		//main tab windows
+		if( GetActiveTabIndex() == 0 )
+		{
+			//::MessageBox(NULL,_T("OK"),NULL,NULL);
+			m_pageMain.DoOK();
+		}
+	}
 	/*
 	void AddTabMain( )
 		{

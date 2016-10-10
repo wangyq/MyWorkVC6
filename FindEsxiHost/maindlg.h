@@ -85,6 +85,9 @@ public:
 	{
 		// TODO: Add validation code 
 		//CloseDialog(wID);
+		//::MessageBox(NULL,_T("°´Å¥"),NULL,NULL);
+		m_tabMain.OnOK();
+		
 		return 0;
 	}
 

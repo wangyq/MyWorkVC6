@@ -322,6 +322,13 @@ public:
         return TRUE;
     }
 
+	//==========================
+	// scan 
+	void DoOK()
+	{
+		m_btnScan.SendMessage(BM_CLICK);
+	}
+
     //===========================
     LRESULT OnCheckEsxi(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
         int ip = (int)lParam;
