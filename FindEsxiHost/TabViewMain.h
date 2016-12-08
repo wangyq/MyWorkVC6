@@ -326,8 +326,9 @@ public:
 	// scan 
 	void DoOK()
 	{
-		//m_btnScan.SendMessage(BM_CLICK);
-		m_btnScan.PostMessage(BM_CLICK);
+		m_btnScan.SendMessage(BM_CLICK);
+		//m_btnScan.PostMessage(BM_CLICK);   // other windows send to BUTTON
+		//m_btnScan.PostMessage(BN_CLICKED); //button's parent window to receive a BN_CLICKED message
 	}
 
     //===========================
