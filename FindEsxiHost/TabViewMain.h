@@ -326,7 +326,8 @@ public:
 	// scan 
 	void DoOK()
 	{
-		m_btnScan.SendMessage(BM_CLICK);
+		//m_btnScan.SendMessage(BM_CLICK);
+		m_btnScan.PostMessage(BM_CLICK);
 	}
 
     //===========================
