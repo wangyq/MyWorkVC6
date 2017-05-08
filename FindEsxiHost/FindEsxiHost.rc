@@ -44,7 +44,7 @@ STYLE WS_CHILD
 FONT 10, "System"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,21,14,20,20
-    LTEXT           "EsxiFinder Application \n(C) Copyright 2016 ",
+    LTEXT           "EsxiFinder Application \n(C) Copyright 2016-2018 ",
                     IDC_STATIC,7,35,103,17
     LTEXT           "https://yinqingwang.wordpress.com",IDC_STATIC_VISIT,40,
                     85,116,8
@@ -213,8 +213,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,3,0,1
- PRODUCTVERSION 1,3,0,1
+ FILEVERSION 1,3,2,0
+ PRODUCTVERSION 1,3,2,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -230,16 +230,16 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "Comments", "\0"
-            VALUE "CompanyName", "\0"
+            VALUE "CompanyName", "Siwind\0"
             VALUE "FileDescription", "FindEsxiHost Module\0"
-            VALUE "FileVersion", "1, 3, 0, 1\0"
+            VALUE "FileVersion", "1, 3, 2, 0\0"
             VALUE "InternalName", "FindEsxiHost\0"
             VALUE "LegalCopyright", "Copyright 2016\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "FindEsxiHost.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "FindEsxiHost Module\0"
-            VALUE "ProductVersion", "1, 3, 0, 1\0"
+            VALUE "ProductVersion", "1, 3, 2, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -345,9 +345,10 @@ STRINGTABLE DISCARDABLE
 BEGIN
     ATL_IDS_MRU_FILE        "Open this document"
     IDS_ESXI_HOST_PORT      "902"
-    IDS_ESXI_HOST_TOKEN     "VMware"
-    IDS_THIS_VERSION        "Version 1.3.0 Final Build-201603062400"
+    IDS_ESXI_HOST_TOKEN     "VMware Authentication Daemon"
+    IDS_THIS_VERSION        "Version 1.3.2 Final Build-201705061200"
     IDS_THREAD_NUMBER_PER_CORE "256"
+    IDS_ESXI_HOST_TOKEN_ESXI "VMXARGS"
 END
 
 #endif    // English (U.S.) resources

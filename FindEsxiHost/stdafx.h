@@ -32,9 +32,14 @@ extern CAppModule _Module;
 // User define 
 #define MSG_ESXI_HOST_CHECK   (WM_USER+100)
 #define OP_ESXI_CHECKING 1
-#define OP_ESXI_FINDED  2
-#define OP_ESXI_FINISHED  3
-#define OP_ESXI_CHECK_START 4
+#define OP_ESXI_CHECK_START 2
+
+#define OP_ESXI_FINDED  3    //FIND VMWARE token of "VMware Authentication Daemon"
+//#define OP_ESXI_FINDED_VMWARE 4  //FIND VMWARE token of "VMware Authentication Daemon"
+#define OP_ESXI_FINDED_ESXI   5  //find VMWARE ESXI token of "VMXARGS"
+
+#define OP_ESXI_FINISHED  16
+
 
 class CWorker;
 template <class Worker> class CThreadPool;

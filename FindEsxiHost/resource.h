@@ -18,6 +18,7 @@
 #define IDS_ESXI_HOST_TOKEN             61404
 #define IDS_THIS_VERSION                61405
 #define IDS_THREAD_NUMBER_PER_CORE      61406
+#define IDS_ESXI_HOST_TOKEN_ESXI        61407
 
 // Next default values for new objects
 // 

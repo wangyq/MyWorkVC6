@@ -4,6 +4,7 @@
 *.ilk
 *.lib
 *.ncb
+*.opt
 *.log
 *.pdb
 *.manifest

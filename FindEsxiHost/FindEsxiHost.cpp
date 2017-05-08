@@ -174,6 +174,7 @@ BOOL IPv4StrToInt(const CString& strIP, int & ip)
 struct tagThreadParam {
     HWND hWnd;
     CString strToken;
+	CString strTokenEsxi;
     int nPort;
     CSimpleValArray<int> arrIP;
 };
@@ -193,6 +194,7 @@ DWORD WINAPI ThreadFun(LPVOID lpParam)
     CSimpleValArray<int> & arrIP = pParam->arrIP;
     int nPort = pParam->nPort;
     const CString& strToken = pParam->strToken;
+	const CString& strTokenEsxi = pParam->strTokenEsxi;
 
     CString strResult;
 
@@ -206,8 +208,12 @@ DWORD WINAPI ThreadFun(LPVOID lpParam)
         if (!ScanEsxiHost(Int2IPv4Str(arrIP[i]).GetBuffer(15), nPort, strResult)) {
             continue;  //not found host!
         }
-        if (strResult.Find(strToken) != -1) {//find esxi host now!
-            ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINDED, (LPARAM)arrIP[i]);
+        if (strResult.Find(strToken) != -1) {//find vmware token now!
+			if( strResult.Find(strTokenEsxi) != -1 ){ //find esxi host
+				::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINDED_ESXI, (LPARAM)arrIP[i]);
+			}else{
+				::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINDED, (LPARAM)arrIP[i]);
+			}
         }
     }
 
@@ -298,8 +304,12 @@ void CWorker::Execute(
     CString strHost = Int2IPv4Str(request);
     ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_CHECKING, (LPARAM)request);
     if (ScanEsxiHost(strHost.GetBuffer(15), pParam->nPort, strResult)) {
-        if (strResult.Find(pParam->strToken) != -1) {//find esxi host now!
-            ::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINDED, (LPARAM)request);
+        if (strResult.Find(pParam->strToken) != -1) {//find vmware token now!
+			if( strResult.Find(pParam->strTokenEsxi) != -1 ){ // find esxi host
+				::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINDED_ESXI, (LPARAM)request);
+			} else {
+				::PostMessage(pParam->hWnd, MSG_ESXI_HOST_CHECK, OP_ESXI_FINDED, (LPARAM)request);
+			}
         }
     }
 

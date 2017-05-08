@@ -13,10 +13,24 @@ template <class T>
 class CMySimpleValArray : public CSimpleValArray< T >
 {
 public:
-	void SetAt(int nIndex, T val)
+	void InsertAt(int nIndex, T val)
 	{
-		ATLASSERT(nIndex >= 0 && nIndex < m_nSize);
-		m_aT[nIndex] = val;
+		ATLASSERT(nIndex >= 0 && nIndex <= m_nSize); //maybe the last location!
+
+		//
+		if( nIndex == m_nSize ){
+			this->Add(val);  //allocate space!
+
+		} else{ //not the last location!
+
+			this->Add(val);  //allocate space!
+			for( int i = this->GetSize()-1; i>nIndex ; i--){
+				m_aT[i] = m_aT[i-1] ;	
+			}
+			m_aT[nIndex] = val;
+
+		}		
+
 	}
 };
 
@@ -26,6 +40,7 @@ public:
 	typedef struct tagThreadParam{
 		HWND hWnd;
 		CString strToken;
+		CString strTokenEsxi;
 		int nPort;		
 	}ThreadParam,*PThreadParam;
 static ThreadParam theWorkerParam;
@@ -48,6 +63,14 @@ class CTabViewMain : public CDialogImpl<CTabViewMain>
 {
 private:
 
+#define VMWARE_TYPE_HOST 1
+#define VMWARE_TYPE_ESXI_HOST 2
+
+	typedef struct tagEsxiHost{
+		int ip;
+		int type;  //1-vmware, 2-vmware esxi
+	}ESXIHOST;
+
     enum {
         E_STATE_NORMAL = 1,
         E_STATE_RUNNING = 2,
@@ -64,6 +87,7 @@ private:
     CEdit m_ctrlEsxiHost;
 
     CString m_strEsxiHostToken;
+	CString m_strEsxiHostTokenEsxi;
     int m_iPort;
 
     //======================
@@ -71,7 +95,8 @@ private:
 
 #define MAX_SIZE 255
 #define PORT 902
-#define TOKEN "VMware"
+#define TOKEN "VMware Authentication Daemon"
+#define TOKEN_ESXI "VMXARGS"
 
         int last = 0;
         TCHAR szStr[MAX_SIZE + 2];
@@ -81,35 +106,37 @@ private:
             m_iPort = PORT;
         }
 
+		//load token
         if ((last = AtlLoadString(IDS_ESXI_HOST_TOKEN, szStr, MAX_SIZE)) > 0) {
             szStr[last] = _T('\0');
-            m_strEsxiHostToken = CString(szStr);  //get port
+            m_strEsxiHostToken = CString(szStr);  //get token
         } else {
             m_strEsxiHostToken = CString(TOKEN);
+        }
+
+		//load esxi_token
+		if ((last = AtlLoadString(IDS_ESXI_HOST_TOKEN_ESXI, szStr, MAX_SIZE)) > 0) {
+            szStr[last] = _T('\0');
+            m_strEsxiHostTokenEsxi = CString(szStr);  //get esxi_token
+        } else {
+            m_strEsxiHostTokenEsxi = CString(TOKEN_ESXI);
         }
     }
 
 	/****************************************
 	* bubble sort
 	*/
-	void InsertHosts(CMySimpleValArray<int> & arrHosts, int ip)
+	void InsertHosts(CMySimpleValArray<ESXIHOST> & arrHosts, ESXIHOST host)
 	{
-		arrHosts.Add(ip); //allocate space!
-
-		//bubble sort
-		int i=0;
-		for( i=arrHosts.GetSize()-1-1; i>=0;i--){
-			int val = arrHosts[i];
-			if( (unsigned int) val > (unsigned int) ip ){  //compare with unsigned int value.
-				arrHosts.SetAt(i+1, val);
-			} else{
-				//arrHosts.SetAt(i+1, ip);
-				break;  //finished loop!
+		//insert sort
+		for( int i=0;i<arrHosts.GetSize();i++){
+			int val = arrHosts[i].ip;
+			if( (unsigned int) val > (unsigned int) host.ip ){  //compare with unsigned int value.
+				break;
 			}
 		}// end of for
 
-		arrHosts.SetAt(i+1, ip);
-		
+		arrHosts.InsertAt(i, host);  //maybe the last location!
 	}
 
 #if 0
@@ -305,9 +332,10 @@ public:
         LoadTokenAndPort(); //load token and port to scan for.
 
 
-		//==
+		//== init search parameter
 		CWorker::theWorkerParam.hWnd = m_hWnd;
 		CWorker::theWorkerParam.strToken = m_strEsxiHostToken;
+		CWorker::theWorkerParam.strTokenEsxi = m_strEsxiHostTokenEsxi;
 		CWorker::theWorkerParam.nPort = m_iPort;
 
 		//
@@ -336,7 +364,9 @@ public:
         int ip = (int)lParam;
         CString strIP = Int2IPv4Str(ip);
         CString strInfo;
-        static CMySimpleValArray<int> arrHosts;
+        //static CMySimpleValArray<int> arrHosts;
+		static CMySimpleValArray<ESXIHOST> arrHosts;
+		ESXIHOST host;
 
         if (wParam == OP_ESXI_CHECK_START) {
 			arrHosts.RemoveAll();
@@ -346,10 +376,20 @@ public:
         } else if (wParam == OP_ESXI_CHECKING) {
             strInfo.Format("Check %s ...\r\n", strIP);
         } else if (wParam == OP_ESXI_FINDED) {
+			host.ip = ip;
+			host.type = VMWARE_TYPE_HOST;  
             //arrHosts.Add(ip);
-			InsertHosts(arrHosts,ip); // increment insert
+			InsertHosts(arrHosts,host); // increment insert
 
-            strInfo.Format("Possible Esxi host found:  %s ...\r\n", strIP);
+            strInfo.Format("Possible Vmware host found:  %s ...\r\n", strIP);
+        } else if (wParam == OP_ESXI_FINDED_ESXI) {
+			host.ip = ip;
+			host.type = VMWARE_TYPE_ESXI_HOST;
+
+            //arrHosts.Add(ip);
+			InsertHosts(arrHosts,host); // increment insert
+
+            strInfo.Format("Possible Vmware Esxi host found:  %s ...\r\n", strIP);
         } else if (wParam == OP_ESXI_FINISHED) {
             m_btnScan.EnableWindow(TRUE); //enable the button!
 
@@ -360,7 +400,13 @@ public:
             tmp.Format(_T("==> Number Esxi Host found is %d .\r\n"), arrHosts.GetSize());
             strInfo += tmp;
             for (int i = 0; i < arrHosts.GetSize(); i++) {
-                strInfo += Int2IPv4Str(arrHosts[i]);
+                strInfo += Int2IPv4Str(arrHosts[i].ip);
+				if( arrHosts[i].type == VMWARE_TYPE_HOST ){
+					strInfo += _T(" ----> Vmware Host");
+				}else{
+					strInfo += _T(" ----> Vmware Esxi Host");
+				}
+
                 strInfo += _T("\r\n");
             }
 
