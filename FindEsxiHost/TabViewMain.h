@@ -32,6 +32,44 @@ public:
 		}		
 
 	}
+	//=======================
+	// insert value with order: 
+	// bAsc = true, ascending, 
+	// bAsc = false, descending
+	void InsertOrdered(T val, bool bAsc=true)
+	{
+		this->Add(val); //resize space
+
+		int i = 0;
+		if( bAsc ){ //asc order
+			//bubble order
+			for( i=m_nSize-1; i>0; i--)
+			{ // the last is val
+				if( m_aT[i-1] > val )
+				{
+					m_aT[i] = m_aT[i-1];
+				} else{//find location
+					break;
+				}
+			} // end of for
+			
+			
+		} else { //desc order
+			//bubble order
+			for( i=m_nSize-1; i>0; i--)
+			{ // the last is val
+				if( m_aT[i-1] < val )
+				{
+					m_aT[i] = m_aT[i-1];
+				} else{//find location
+					break;
+				}
+			} // end of for
+		}// end of if
+		
+		m_aT[i] = val;  //insert val!
+	}
+
 };
 
 
@@ -62,14 +100,6 @@ public:
 class CTabViewMain : public CDialogImpl<CTabViewMain>
 {
 private:
-
-#define VMWARE_TYPE_HOST 1
-#define VMWARE_TYPE_ESXI_HOST 2
-
-	typedef struct tagEsxiHost{
-		int ip;
-		int type;  //1-vmware, 2-vmware esxi
-	}ESXIHOST;
 
     enum {
         E_STATE_NORMAL = 1,
@@ -123,21 +153,6 @@ private:
         }
     }
 
-	/****************************************
-	* bubble sort
-	*/
-	void InsertHosts(CMySimpleValArray<ESXIHOST> & arrHosts, ESXIHOST host)
-	{
-		//insert sort
-		for( int i=0;i<arrHosts.GetSize();i++){
-			int val = arrHosts[i].ip;
-			if( (unsigned int) val > (unsigned int) host.ip ){  //compare with unsigned int value.
-				break;
-			}
-		}// end of for
-
-		arrHosts.InsertAt(i, host);  //maybe the last location!
-	}
 
 #if 0
     //Split string
@@ -361,33 +376,25 @@ public:
 
     //===========================
     LRESULT OnCheckEsxi(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/) {
-        int ip = (int)lParam;
+        unsigned int ip = (int)lParam;
         CString strIP = Int2IPv4Str(ip);
         CString strInfo;
-        //static CMySimpleValArray<int> arrHosts;
-		static CMySimpleValArray<ESXIHOST> arrHosts;
-		ESXIHOST host;
+        static CMySimpleValArray<unsigned int> arrHosts, arrHostsEsxi;
 
         if (wParam == OP_ESXI_CHECK_START) {
 			arrHosts.RemoveAll();
+			arrHostsEsxi.RemoveAll();
 
             strInfo.Format(_T("[%s] Start scanning : \r\n"), GetCurrentTimeStr());
 
         } else if (wParam == OP_ESXI_CHECKING) {
             strInfo.Format("Check %s ...\r\n", strIP);
         } else if (wParam == OP_ESXI_FINDED) {
-			host.ip = ip;
-			host.type = VMWARE_TYPE_HOST;  
-            //arrHosts.Add(ip);
-			InsertHosts(arrHosts,host); // increment insert
+			arrHosts.InsertOrdered(ip); //
 
             strInfo.Format("Possible Vmware host found:  %s ...\r\n", strIP);
         } else if (wParam == OP_ESXI_FINDED_ESXI) {
-			host.ip = ip;
-			host.type = VMWARE_TYPE_ESXI_HOST;
-
-            //arrHosts.Add(ip);
-			InsertHosts(arrHosts,host); // increment insert
+			arrHostsEsxi.InsertOrdered(ip); //
 
             strInfo.Format("Possible Vmware Esxi host found:  %s ...\r\n", strIP);
         } else if (wParam == OP_ESXI_FINISHED) {
@@ -397,18 +404,18 @@ public:
             tmp.Format(_T("[%s] Scan finished!\r\n"), GetCurrentTimeStr());
             strInfo += tmp;
 
-            tmp.Format(_T("==> Number Esxi Host found is %d .\r\n"), arrHosts.GetSize());
+            tmp.Format(_T("==> Number Esxi Host found is %d .\r\n"), arrHosts.GetSize() + arrHostsEsxi.GetSize());
             strInfo += tmp;
             for (int i = 0; i < arrHosts.GetSize(); i++) {
-                strInfo += Int2IPv4Str(arrHosts[i].ip);
-				if( arrHosts[i].type == VMWARE_TYPE_HOST ){
-					strInfo += _T(" ----> Vmware Host");
-				}else{
-					strInfo += _T(" ----> Vmware Esxi Host");
-				}
-
+                strInfo += Int2IPv4Str(arrHosts[i]);
+			strInfo += _T(" ----> Vmware Host");
                 strInfo += _T("\r\n");
-            }
+            } //end of for
+			for ( i = 0; i < arrHostsEsxi.GetSize(); i++) {
+				strInfo += Int2IPv4Str(arrHostsEsxi[i]);
+				strInfo += _T(" ----> Vmware Esxi Host");
+                strInfo += _T("\r\n");
+			}
 
             strInfo += _T("\r\n");
 
